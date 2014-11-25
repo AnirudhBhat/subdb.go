@@ -3,6 +3,7 @@ package main
 import (
 	"crypto/md5"
 	"encoding/hex"
+	"flag"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -11,6 +12,16 @@ import (
 	"os/exec"
 	"path"
 )
+
+var (
+	filepath string
+	language string
+)
+
+func init() {
+	flag.StringVar(&filepath, "p", "", "Path to the movie file")
+	flag.StringVar(&language, "l", "en", "Subtitle language")
+}
 
 /*
 
@@ -103,8 +114,17 @@ func notify(path string) {
 }
 
 func main() {
-	movie_path := os.Args[1]
-	language := os.Args[2]
-	SubDownloader(movie_path, language)
-	notify(movie_path)
+	//movie_path := os.Args[1]
+	//language := os.Args[2]
+	flag.Parse()
+	if filepath == "" {
+		fmt.Println("Please provide path to movie file")
+		os.Exit(1)
+	}
+	if len(language) != 2 {
+		fmt.Println("invalid language, Please enter any one of these [en,es,fr,it,nl,pl,pt,ro,sv,tr]")
+	}
+	//SubDownloader(movie_path, language)
+	SubDownloader(filepath, language)
+	notify(filepath)
 }
