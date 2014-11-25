@@ -55,9 +55,9 @@ func GetHash(name string) string {
 	return " "
 }
 
-func SubDownloader(video_path string) {
+func SubDownloader(video_path, language string) {
 	hash := GetHash(video_path)
-	url := "http://api.thesubdb.com/?action=download&hash=" + hash + "&language=en"
+	url := "http://api.thesubdb.com/?action=download&hash=" + hash + "&language=" + language + ",en"
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -65,6 +65,10 @@ func SubDownloader(video_path string) {
 	} else {
 		req.Header.Set("User-Agent", "SubDB/1.0 (SubDownloader/0.1; http://github.com/AnirudhBhat)")
 		resp, err := client.Do(req)
+		if resp.StatusCode == 404 {
+			fmt.Println("we did not find subtitle for " + language + " language. Please try any other language")
+			os.Exit(0)
+		}
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -100,6 +104,7 @@ func notify(path string) {
 
 func main() {
 	movie_path := os.Args[1]
-	SubDownloader(movie_path)
+	language := os.Args[2]
+	SubDownloader(movie_path, language)
 	notify(movie_path)
 }
